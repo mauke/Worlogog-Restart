@@ -8,9 +8,9 @@ our $VERSION = '0.01';
 use Moo;
 
 for (qw(name code)) {
-	has $_ => (
-		is => 'ro',
-	);
+    has $_ => (
+        is => 'ro',
+    );
 }
 
 'ok'

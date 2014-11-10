@@ -6,15 +6,15 @@ use strict;
 our $VERSION = '0.01';
 
 use Sub::Exporter -setup => {
-	exports => [
-		qw(
-			case
-			bind
-			invoke
-			find
-			compute
-		)
-	],
+    exports => [
+        qw(
+            case
+            bind
+            invoke
+            find
+            compute
+        )
+    ],
 };
 
 use Carp qw(croak);
@@ -24,76 +24,76 @@ use Return::MultiLevel qw(with_return);
 our @restarts;
 
 sub bind (&$) {
-	my ($body, $handlers) = @_;
-	my $limit = @restarts;
-	my $guard = on_scope_exit { splice @restarts, $limit };
-	push @restarts, \%$handlers;
-	$body->()
+    my ($body, $handlers) = @_;
+    my $limit = @restarts;
+    my $guard = on_scope_exit { splice @restarts, $limit };
+    push @restarts, \%$handlers;
+    $body->()
 }
 
 sub case (&$) {
-	my ($body, $handlers) = @_;
-	my $limit = @restarts;
-	my $guard = on_scope_exit { splice @restarts, $limit };
-	my $wantlist = wantarray;
-	my @v = with_return {
-		my ($return) = @_;
-		push @restarts, {
-			map {
-				my $v = $handlers->{$_};
-				$_ => sub { $return->($v, @_) }
-			} keys %$handlers
-		};
-		unless (defined $wantlist) {
-			$body->();
-			return;
-		}
-		undef, $wantlist ? $body->() : scalar $body->()
-	};
-	if (my $f = shift @v) {
-		return $f->(@v);
-	}
-	$wantlist ? @v : $v[0]
+    my ($body, $handlers) = @_;
+    my $limit = @restarts;
+    my $guard = on_scope_exit { splice @restarts, $limit };
+    my $wantlist = wantarray;
+    my @v = with_return {
+        my ($return) = @_;
+        push @restarts, {
+            map {
+                my $v = $handlers->{$_};
+                $_ => sub { $return->($v, @_) }
+            } keys %$handlers
+        };
+        unless (defined $wantlist) {
+            $body->();
+            return;
+        }
+        undef, $wantlist ? $body->() : scalar $body->()
+    };
+    if (my $f = shift @v) {
+        return $f->(@v);
+    }
+    $wantlist ? @v : $v[0]
 }
 
 sub _find {
-	my ($k) = @_;
-	for my $rs (reverse @restarts) {
-		my $v = $rs->{$k};
-		return $v if $v;
-	}
-	undef
+    my ($k) = @_;
+    for my $rs (reverse @restarts) {
+        my $v = $rs->{$k};
+        return $v if $v;
+    }
+    undef
 }
 
 sub invoke {
-	my $proto = shift;
-	my $code = ref $proto ? $proto->code : _find($proto) || croak qq{No restart named "$proto" is active};
-	$code->(@_)
+    my $proto = shift;
+    my $code = ref $proto ? $proto->code : _find($proto) || croak qq{No restart named "$proto" is active};
+    $code->(@_)
 }
 
 sub find {
-	my ($name) = @_;
-	my $code = _find($name) or return undef;
-	require Worlogog::Restart::Restart;
-	Worlogog::Restart::Restart->new(
-		name => $name,
-		code => $code,
-	)
+    my ($name) = @_;
+    my $code = _find($name) or return undef;
+    require Worlogog::Restart::Restart;
+    Worlogog::Restart::Restart->new(
+        name => $name,
+        code => $code,
+    )
 }
 
 sub compute {
-	my @r;
-	for my $rs (reverse @restarts) {
-		for my $k (sort keys %$rs) {
-			my $v = $rs->{$k};
-			require Worlogog::Restart::Restart;
-			push @r, Worlogog::Restart::Restart->new(
-				name => $k,
-				code => $v,
-			);
-		}
-	}
-	@r
+    my @r;
+    for my $rs (reverse @restarts) {
+        for my $k (sort keys %$rs) {
+            my $v = $rs->{$k};
+            require Worlogog::Restart::Restart;
+            push @r, Worlogog::Restart::Restart->new(
+                name => $k,
+                code => $v,
+            );
+        }
+    }
+    @r
 }
 
 'ok'
