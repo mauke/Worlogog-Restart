@@ -5,21 +5,18 @@ use strict;
 
 our $VERSION = '0.01';
 
-use Sub::Exporter -setup => {
-    exports => [
-        qw(
-            case
-            bind
-            invoke
-            find
-            compute
-        )
-    ],
-};
-
 use Carp qw(croak);
 use Scope::OnExit::Wrap qw(on_scope_exit);
 use Return::MultiLevel qw(with_return);
+
+use parent 'Exporter::Tiny';
+our @EXPORT_OK = qw(
+    case
+    bind
+    invoke
+    find
+    compute
+);
 
 our @restarts;
 
@@ -227,12 +224,12 @@ they're shadowed by a more recent restart with the same name:
 
 =back
 
-This module uses L<C<Sub::Exporter>|Sub::Exporter>, so you can rename the
+This module uses L<C<Exporter::Tiny>|Exporter::Tiny>, so you can rename the
 imported functions at L<C<use>|perlfunc/use> time.
 
 =head1 SEE ALSO
 
-L<Sub::Exporter>, L<Return::MultiLevel>
+L<Exporter::Tiny>, L<Return::MultiLevel>
 
 =head1 AUTHOR
 
