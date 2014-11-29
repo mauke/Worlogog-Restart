@@ -3,7 +3,7 @@ package Worlogog::Restart;
 use warnings;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw(croak);
 use Scope::OnExit::Wrap qw(on_scope_exit);
