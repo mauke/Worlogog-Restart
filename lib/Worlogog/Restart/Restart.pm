@@ -5,13 +5,15 @@ use strict;
 
 our $VERSION = '0.02';
 
-use Moo;
+sub DESTROY {}
 
-for (qw(name code)) {
-    has $_ => (
-        is => 'ro',
-    );
+sub new {
+    my ($class, %self) = @_;
+    bless \%self, $class
 }
+
+sub name { $_[0]{name} }
+sub code { $_[0]{code} }
 
 'ok'
 

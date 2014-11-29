@@ -31,7 +31,6 @@ my %opt = (
         'parent'              => 0,
         'Carp'                => 0,
         'Exporter::Tiny'      => 0,
-        'Moo'                 => 0,
         'Return::MultiLevel'  => 0,
         'Scope::OnExit::Wrap' => 0,
     },
